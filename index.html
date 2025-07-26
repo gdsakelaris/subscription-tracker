@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Subscription Tracker</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                padding: 30px;
+                text-align: center;
+                color: white;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .header p {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+
+            .main-content {
+                padding: 40px;
+            }
+
+            .form-section {
+                background: #f8f9ff;
+                border-radius: 15px;
+                padding: 30px;
+                margin-bottom: 30px;
+                border: 2px solid #e1e8ff;
+            }
+
+            .form-section h2 {
+                color: #4a5568;
+                margin-bottom: 20px;
+                font-size: 1.5rem;
+            }
+
+            .form-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .form-group label {
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #4a5568;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 12px 15px;
+                border: 2px solid #e1e8ff;
+                border-radius: 10px;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #4facfe;
+                box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            }
+
+            .button-group {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                border: none;
+                border-radius: 10px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+            }
+
+            .btn-secondary {
+                background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+                color: #4a5568;
+            }
+
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(168, 237, 234, 0.3);
+            }
+
+            .subscriptions-list {
+                background: white;
+                border-radius: 15px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .list-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px 30px;
+            }
+
+            .list-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .subscription-item {
+                padding: 25px 30px;
+                border-bottom: 1px solid #f0f4f8;
+                transition: all 0.3s ease;
+                position: relative;
+            }
+
+            .subscription-item:hover {
+                background: #f8f9ff;
+                transform: translateX(5px);
+            }
+
+            .subscription-item:last-child {
+                border-bottom: none;
+            }
+
+            .subscription-info {
+                display: grid;
+                grid-template-columns: 2fr 1fr 1fr 1fr auto;
+                gap: 20px;
+                align-items: center;
+            }
+
+            .subscription-name {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #2d3748;
+            }
+
+            .subscription-cost {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #4facfe;
+            }
+
+            .subscription-frequency {
+                color: #718096;
+                font-weight: 500;
+            }
+
+            .subscription-payment {
+                color: #4a5568;
+                font-weight: 500;
+            }
+
+            .subscription-actions {
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn-small {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+
+            .btn-edit {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+            }
+
+            .btn-delete {
+                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+                color: #e53e3e;
+            }
+
+            .btn-edit:hover,
+            .btn-delete:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .total-cost {
+                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+                padding: 25px 30px;
+                text-align: center;
+                border-radius: 15px;
+                margin-top: 20px;
+            }
+
+            .total-cost h3 {
+                font-size: 1.3rem;
+                color: #4a5568;
+                margin-bottom: 10px;
+            }
+
+            .total-amount {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #e53e3e;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 60px 30px;
+                color: #718096;
+            }
+
+            .empty-state h3 {
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .subscription-info {
+                    grid-template-columns: 1fr;
+                    gap: 10px;
+                }
+
+                .form-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .button-group {
+                    justify-content: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>💳 Subscription Tracker</h1>
+                <p>Keep track of all your recurring subscriptions and payments</p>
+            </div>
+
+            <div class="main-content">
+                <div class="form-section">
+                    <h2 id="form-title">Add New Subscription</h2>
+                    <form id="subscription-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Subscription Name *</label>
+                                <input type="text" id="name" name="name" required placeholder="e.g., Netflix, Spotify">
+                            </div>
+                            <div class="form-group">
+                                <label for="cost">Cost *</label>
+                                <input type="number" id="cost" name="cost" step="0.01" min="0" required
+                                    placeholder="0.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="frequency">Billing Frequency *</label>
+                                <select id="frequency" name="frequency" required>
+                                    <option value="">Select frequency</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="payment-method">Payment Method</label>
+                                <input type="text" id="payment-method" name="payment-method"
+                                    placeholder="e.g., Visa ending in 1234">
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Add Subscription</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-btn"
+                                style="display: none;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="subscriptions-list">
+                    <div class="list-header">
+                        <h2>Your Subscriptions</h2>
+                    </div>
+                    <div id="subscriptions-container">
+                        <div class="empty-state">
+                            <h3>No subscriptions yet</h3>
+                            <p>Add your first subscription using the form above</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="total-cost" id="total-cost" style="display: none;">
+                    <h3>Total Monthly Cost</h3>
+                    <div class="total-amount" id="total-amount">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            class SubscriptionTracker {
+                constructor() {
+                    this.subscriptions = this.loadSubscriptions();
+                    this.editingId = null;
+                    this.initializeEventListeners();
+                    this.renderSubscriptions();
+                    this.updateTotalCost();
+                }
+
+                initializeEventListeners() {
+                    const form = document.getElementById('subscription-form');
+                    const cancelBtn = document.getElementById('cancel-btn');
+
+                    form.addEventListener('submit', (e) => this.handleSubmit(e));
+                    cancelBtn.addEventListener('click', () => this.cancelEdit());
+                }
+
+                handleSubmit(e) {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+
+                    const subscription = {
+                        id: this.editingId || this.generateId(),
+                        name: formData.get('name'),
+                        cost: parseFloat(formData.get('cost')),
+                        frequency: formData.get('frequency'),
+                        paymentMethod: formData.get('payment-method') || 'Not specified'
+                    };
+
+                    if (this.editingId) {
+                        this.updateSubscription(subscription);
+                    } else {
+                        this.addSubscription(subscription);
+                    }
+
+                    this.resetForm();
+                    this.renderSubscriptions();
+                    this.updateTotalCost();
+                    this.saveSubscriptions();
+                }
+
+                addSubscription(subscription) {
+                    this.subscriptions.push(subscription);
+                }
+
+                updateSubscription(updatedSubscription) {
+                    const index = this.subscriptions.findIndex(sub => sub.id === updatedSubscription.id);
+                    if (index !== -1) {
+                        this.subscriptions[index] = updatedSubscription;
+                    }
+                    this.editingId = null;
+                }
+
+                deleteSubscription(id) {
+                    if (confirm('Are you sure you want to delete this subscription?')) {
+                        this.subscriptions = this.subscriptions.filter(sub => sub.id !== id);
+                        this.renderSubscriptions();
+                        this.updateTotalCost();
+                        this.saveSubscriptions();
+                    }
+                }
+
+                editSubscription(id) {
+                    const subscription = this.subscriptions.find(sub => sub.id === id);
+                    if (subscription) {
+                        this.editingId = id;
+                        this.populateForm(subscription);
+                    }
+                }
+
+                populateForm(subscription) {
+                    document.getElementById('name').value = subscription.name;
+                    document.getElementById('cost').value = subscription.cost;
+                    document.getElementById('frequency').value = subscription.frequency;
+                    document.getElementById('payment-method').value = subscription.paymentMethod;
+
+                    document.getElementById('form-title').textContent = 'Edit Subscription';
+                    document.getElementById('submit-btn').textContent = 'Update Subscription';
+                    document.getElementById('cancel-btn').style.display = 'inline-block';
+                }
+
+                cancelEdit() {
+                    this.editingId = null;
+                    this.resetForm();
+                }
+
+                resetForm() {
+                    document.getElementById('subscription-form').reset();
+                    document.getElementById('form-title').textContent = 'Add New Subscription';
+                    document.getElementById('submit-btn').textContent = 'Add Subscription';
+                    document.getElementById('cancel-btn').style.display = 'none';
+                }
+
+                renderSubscriptions() {
+                    const container = document.getElementById('subscriptions-container');
+
+                    if (this.subscriptions.length === 0) {
+                        container.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No subscriptions yet</h3>
+                            <p>Add your first subscription using the form above</p>
+                        </div>
+                    `;
+                        return;
+                    }
+
+                    container.innerHTML = this.subscriptions.map(sub => `
+                    <div class="subscription-item">
+                        <div class="subscription-info">
+                            <div class="subscription-name">${sub.name}</div>
+                            <div class="subscription-cost">$${sub.cost.toFixed(2)}</div>
+                            <div class="subscription-frequency">${this.capitalizeFirst(sub.frequency)}</div>
+                            <div class="subscription-payment">${sub.paymentMethod}</div>
+                            <div class="subscription-actions">
+                                <button class="btn btn-edit btn-small" onclick="tracker.editSubscription('${sub.id}')">Edit</button>
+                                <button class="btn btn-delete btn-small" onclick="tracker.deleteSubscription('${sub.id}')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                }
+
+                updateTotalCost() {
+                    const totalCostElement = document.getElementById('total-cost');
+                    const totalAmountElement = document.getElementById('total-amount');
+
+                    if (this.subscriptions.length === 0) {
+                        totalCostElement.style.display = 'none';
+                        return;
+                    }
+
+                    const monthlyTotal = this.subscriptions.reduce((total, sub) => {
+                        let monthlyCost = sub.cost;
+
+                        switch (sub.frequency) {
+                            case 'weekly':
+                                monthlyCost = sub.cost * 4.33; // Average weeks per month
+                                break;
+                            case 'quarterly':
+                                monthlyCost = sub.cost / 3;
+                                break;
+                            case 'yearly':
+                                monthlyCost = sub.cost / 12;
+                                break;
+                            // monthly stays the same
+                        }
+
+                        return total + monthlyCost;
+                    }, 0);
+
+                    totalAmountElement.textContent = `$${monthlyTotal.toFixed(2)}`;
+                    totalCostElement.style.display = 'block';
+                }
+
+                generateId() {
+                    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+                }
+
+                capitalizeFirst(str) {
+                    return str.charAt(0).toUpperCase() + str.slice(1);
+                }
+
+                saveSubscriptions() {
+                    // Save to localStorage for persistence
+                    localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions));
+                }
+
+                loadSubscriptions() {
+                    // Load from localStorage
+                    const saved = localStorage.getItem('subscriptions');
+                    return saved ? JSON.parse(saved) : [];
+                }
+
+                exportData() {
+                    const data = JSON.stringify(this.subscriptions, null, 2);
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'subscriptions-backup.json';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+
+                importData(jsonString) {
+                    try {
+                        const importedData = JSON.parse(jsonString);
+                        if (Array.isArray(importedData)) {
+                            this.subscriptions = importedData;
+                            this.saveSubscriptions();
+                            this.renderSubscriptions();
+                            this.updateTotalCost();
+                            alert('Data imported successfully!');
+                        } else {
+                            alert('Invalid file format. Please select a valid subscription backup file.');
+                        }
+                    } catch (error) {
+                        alert('Error importing data. Please check the file format.');
+                    }
+                }
+            }
+
+            // Initialize the application
+            const tracker = new SubscriptionTracker();
+
+            // Electron IPC handlers for import/export
+            if (typeof require !== 'undefined') {
+                const { ipcRenderer } = require('electron');
+
+                // Handle export request
+                ipcRenderer.on('export-data', async (event, filePath) => {
+                    const data = JSON.stringify(tracker.subscriptions, null, 2);
+                    const result = await ipcRenderer.invoke('save-file', filePath, data);
+                    if (result.success) {
+                        alert('Data exported successfully!');
+                    } else {
+                        alert('Failed to export data: ' + result.error);
+                    }
+                });
+
+                // Handle import request
+                ipcRenderer.on('import-data', (event, data) => {
+                    tracker.importData(data);
+                });
+            }
+
+            // Add export button for web version
+            if (typeof require === 'undefined') {
+                const buttonGroup = document.querySelector('.button-group');
+                const exportBtn = document.createElement('button');
+                exportBtn.type = 'button';
+                exportBtn.className = 'btn btn-secondary';
+                exportBtn.textContent = 'Export Data';
+                exportBtn.onclick = () => tracker.exportData();
+                buttonGroup.appendChild(exportBtn);
+            }
+        </script>
+    </body>
+</html>
